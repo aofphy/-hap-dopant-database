@@ -1,10 +1,12 @@
+import logoUrl from '../assets/logo.png'
+
 export function Footer() {
   return (
     <footer className="bg-near-black border-t border-dark-surface py-12 px-6">
       <div className="max-w-5xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <img src="/logo.png" alt="AIMS — Artificial Intelligence & Modeling for Materials Science" className="h-10 mb-3 brightness-0 invert opacity-80" />
+            <img src={logoUrl} alt="AIMS — Artificial Intelligence & Modeling for Materials Science" className="h-10 mb-3 brightness-0 invert opacity-80" />
             <h3 className="font-serif text-lg font-medium text-ivory mb-2">HAp Dopant Database</h3>
             <p className="text-stone-gray text-sm leading-relaxed">
               Machine-learning screening of cationic dopants in hydroxyapatite via transfer learning,
