@@ -13,8 +13,11 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-parchment/95 backdrop-blur-sm border-b border-border-cream">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="#" className="font-serif text-xl font-medium text-near-black tracking-tight">
-          HAp Dopant Database
+        <a href="#" className="flex items-center gap-3">
+          <img src="/logo.png" alt="AIMS Lab" className="h-9" />
+          <span className="font-serif text-lg font-medium text-near-black tracking-tight hidden sm:inline">
+            HAp Dopant Database
+          </span>
         </a>
 
         {/* Desktop */}

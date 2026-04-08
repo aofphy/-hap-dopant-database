@@ -4,7 +4,8 @@ export function Footer() {
       <div className="max-w-5xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="font-serif text-lg font-medium text-ivory mb-3">HAp Dopant Database</h3>
+            <img src="/logo.png" alt="AIMS — Artificial Intelligence & Modeling for Materials Science" className="h-10 mb-3 brightness-0 invert opacity-80" />
+            <h3 className="font-serif text-lg font-medium text-ivory mb-2">HAp Dopant Database</h3>
             <p className="text-stone-gray text-sm leading-relaxed">
               Machine-learning screening of cationic dopants in hydroxyapatite via transfer learning,
               validated by density functional theory.

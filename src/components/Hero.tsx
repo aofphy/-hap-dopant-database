@@ -2,6 +2,7 @@ export function Hero() {
   return (
     <section className="bg-parchment py-20 md:py-28 px-6">
       <div className="max-w-4xl mx-auto text-center">
+        <img src="/logo.png" alt="AIMS Lab" className="h-12 mx-auto mb-6" />
         <p className="text-terracotta text-sm font-medium tracking-wider uppercase mb-4">
           Machine Learning for Biomaterials
         </p>
