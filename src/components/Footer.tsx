@@ -36,9 +36,13 @@ export function Footer() {
           <p className="text-stone-gray text-xs">
             Data: AFLOW, MatBench databases. Models: scikit-learn + Matminer. DFT: VASP (PBE).
           </p>
-          <p className="text-stone-gray text-xs">
-            Built for the materials science research community.
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-stone-gray text-xs">
+              Built for the materials science research community.
+            </p>
+            <img src="https://hap-dopant-db.goatcounter.com/counter/TOTAL.svg"
+                 alt="Total visits" className="h-4 opacity-70" loading="lazy" />
+          </div>
         </div>
       </div>
     </footer>
