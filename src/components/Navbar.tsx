@@ -12,7 +12,8 @@ function VisitorCount() {
   const [n, setN] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('https://hap-dopant-db.goatcounter.com/counter/TOTAL.json')
+    // ponytail: per-path count; TOTAL.json returns 0 on this site. Single-page site = same number.
+    fetch(`https://hap-dopant-db.goatcounter.com/counter/${encodeURIComponent(location.pathname)}.json`)
       .then(r => r.json())
       .then(d => setN(Number(d.count).toLocaleString()))
       .catch(() => {}) // ponytail: counter down = no badge, not a broken page
