@@ -136,7 +136,7 @@ export function PeriodicTableView({ selectedDopant, onSelectDopant }: Props) {
               </div>
               <div>
                 <div className="text-stone-gray">Ionic Radius</div>
-                <div className="text-ivory font-medium">{selectedDopant.ionicRadius.toFixed(2)} A</div>
+                <div className="text-ivory font-medium">{selectedDopant.ionicRadius.toFixed(2)} Å</div>
               </div>
               <div>
                 <div className="text-stone-gray">Group</div>
