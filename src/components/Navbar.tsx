@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import logoUrl from '../assets/logo.png'
 
 const navLinks = [
@@ -7,6 +7,29 @@ const navLinks = [
   { href: '#predict', label: 'Prediction Tool' },
   { href: '#methodology', label: 'Methodology' },
 ]
+
+function VisitorCount() {
+  const [n, setN] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('https://hap-dopant-db.goatcounter.com/counter/TOTAL.json')
+      .then(r => r.json())
+      .then(d => setN(Number(d.count).toLocaleString()))
+      .catch(() => {}) // ponytail: counter down = no badge, not a broken page
+  }, [])
+
+  if (!n) return null
+  return (
+    <span
+      title="Total page views"
+      className="flex items-center gap-2 border border-border-cream bg-ivory rounded-full px-3 py-1.5 text-sm"
+    >
+      <span className="w-2 h-2 rounded-full bg-terracotta" />
+      <span className="font-mono font-medium text-near-black tabular-nums">{n}</span>
+      <span className="text-olive-gray hidden sm:inline">views</span>
+    </span>
+  )
+}
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
@@ -21,6 +44,7 @@ export function Navbar() {
           </span>
         </a>
 
+        <div className="flex items-center gap-4">
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map(l => (
@@ -42,6 +66,9 @@ export function Navbar() {
             {open ? <path d="M6 6l12 12M6 18L18 6" /> : <path d="M4 8h16M4 16h16" />}
           </svg>
         </button>
+
+        <VisitorCount />
+        </div>
       </div>
 
       {/* Mobile menu */}
