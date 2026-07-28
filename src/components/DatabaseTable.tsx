@@ -37,7 +37,7 @@ export function DatabaseTable({ onSelectDopant }: Props) {
 
   const SortIcon = ({ col }: { col: SortKey }) => {
     if (sortKey !== col) return <span className="text-stone-gray/50 ml-1">&#8597;</span>
-    return <span className="text-terracotta ml-1">{sortAsc ? '&#9650;' : '&#9660;'}</span>
+    return <span className="text-terracotta ml-1">{sortAsc ? '▲' : '▼'}</span>
   }
 
   return (
