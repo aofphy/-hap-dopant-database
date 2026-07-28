@@ -98,7 +98,7 @@ export function Methodology() {
               </li>
               <li className="flex gap-2">
                 <span className="text-terracotta font-bold mt-0.5">&#8226;</span>
-                <span>Optimal ionic radius range: 0.70&ndash;0.90 \u00C5 for mechanical enhancement</span>
+                <span>Optimal ionic radius range: 0.70&ndash;0.90 Å for mechanical enhancement</span>
               </li>
             </ul>
           </div>
@@ -144,7 +144,7 @@ export function Methodology() {
           <h3 className="font-serif text-xl font-medium text-near-black mb-2">DFT Validation</h3>
           <p className="text-olive-gray text-sm mb-4">
             Independent DFT calculations (VASP, PBE functional) on 20 representative dopants at both Ca1 (4f) and Ca2 (6h) sites
-            confirm ML predictions with lattice-parameter agreement within 0.01 \u00C5.
+            confirm ML predictions with lattice-parameter agreement within 0.01 Å.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[
