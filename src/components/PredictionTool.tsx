@@ -1,28 +1,10 @@
 import { useState, useMemo } from 'react'
-import { dopants, dopantMap, PURE_HAP_K, bfomRanking, coDopingData, type Dopant } from '../data/dopants'
+import { dopants, dopantMap, PURE_HAP_K, PURE_HAP_K_DFT, coDopingData, computeBFoM, dftElasticMap, type Dopant } from '../data/dopants'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, ScatterChart, Scatter, ZAxis } from 'recharts'
 
 interface Props {
   selectedDopant: Dopant | null
   onSelectDopant: (d: Dopant | null) => void
-}
-
-// Estimate substitution energy based on ionic radius mismatch and charge difference (from paper Eq. 5)
-function estimateEs(ionicRadius: number, charge: number): number {
-  const deltaR = Math.abs(ionicRadius - 1.0) // Ca2+ radius = 1.0 Å
-  const deltaQ = Math.abs(charge - 2)
-  return 2.5 * deltaR * deltaR + 0.8 * deltaQ + 0.1
-}
-
-// Compute BFoM (from paper Eq. 4)
-function computeBFoM(K: number, EsEst: number, Eg: number, toxicity: string): number {
-  const K0 = PURE_HAP_K
-  const Eg0 = 5.25 // pure HAp band gap from DFT
-  const Tf = toxicity === 'Low' ? 1.0 : toxicity === 'Moderate' ? 0.5 : 0.1
-  const mechFactor = K / K0
-  const stabFactor = 1 / (1 + EsEst)
-  const elecFactor = 1 - Math.abs(Eg - Eg0) / (2 * Eg0)
-  return mechFactor * stabFactor * Math.max(0, elecFactor) * Tf
 }
 
 // Simple concentration-dependent model (linear interpolation inspired by paper)
@@ -44,12 +26,12 @@ export function PredictionTool({ selectedDopant, onSelectDopant }: Props) {
     if (!dopant1) return null
     const K = predictKAtConcentration(dopant1.K, concentration)
     const deltaK = ((K - PURE_HAP_K) / PURE_HAP_K) * 100
-    const EsEst = estimateEs(dopant1.ionicRadius, dopant1.charge)
-    // Simplified band gap estimate (from BFoM table or approximate)
-    const bfomEntry = bfomRanking.find(b => b.element === dopant1.element)
-    const Eg = bfomEntry?.Eg || 3.0
-    const bfom = computeBFoM(K, EsEst, Eg, dopant1.toxicity)
-    return { K, deltaK, EsEst, Eg, bfom }
+    // ML formation energy and band gap are the 10 mol% screening values (paper Eq. 5 inputs)
+    const dEForm = dopant1.dEForm
+    const Eg = dopant1.eGap
+    const bfom = computeBFoM(K, dEForm, Eg, dopant1.toxicity)
+    const dft = dftElasticMap.get(dopant1.element) ?? null
+    return { K, deltaK, dEForm, Eg, bfom, dft }
   }, [dopant1, concentration])
 
   // Bar chart data for group comparison
@@ -165,8 +147,8 @@ export function PredictionTool({ selectedDopant, onSelectDopant }: Props) {
                       value={`${singlePrediction.deltaK > 0 ? '+' : ''}${singlePrediction.deltaK.toFixed(2)}%`}
                       highlight={singlePrediction.deltaK >= 0}
                     />
-                    <ResultCard label="Est. Sub. Energy" value={`${singlePrediction.EsEst.toFixed(2)} eV`} />
-                    <ResultCard label="Band Gap" value={`${singlePrediction.Eg.toFixed(2)} eV`} />
+                    <ResultCard label="|\u0394E_form| vs host" value={`${singlePrediction.dEForm.toFixed(3)} eV/atom`} />
+                    <ResultCard label="Band Gap (ML)" value={`${singlePrediction.Eg.toFixed(2)} eV`} />
                     <ResultCard label="Ionic Radius" value={`${dopant1.ionicRadius} \u00C5`} />
                     <ResultCard label="Charge" value={`+${dopant1.charge}`} />
                   </div>
@@ -177,17 +159,36 @@ export function PredictionTool({ selectedDopant, onSelectDopant }: Props) {
                       <span className="font-serif text-3xl text-coral font-medium">
                         {singlePrediction.bfom.toFixed(3)}
                       </span>
-                      <span className="text-stone-gray text-xs mb-1">/ 1.000</span>
+                      <span className="text-stone-gray text-xs mb-1">
+                        / 1.000 (host){dopant1.bfomRank !== null && concentration === 10 ? ` \u00B7 rank ${dopant1.bfomRank} of 58` : ''}
+                      </span>
                     </div>
                     <div className="mt-2 h-2 bg-dark-surface rounded-full overflow-hidden">
                       <div
                         className="h-full bg-gradient-to-r from-terracotta to-coral rounded-full transition-all"
-                        style={{ width: `${singlePrediction.bfom * 100}%` }}
+                        style={{ width: `${Math.min(100, singlePrediction.bfom * 100)}%` }}
                       />
                     </div>
                     <p className="text-stone-gray text-xs mt-2">
-                      Combines mechanical enhancement, thermodynamic stability, electronic structure, and toxicity.
+                      Combines mechanical enhancement, thermodynamic compatibility, electronic structure, and toxicity (paper Eq. 5).
                     </p>
+                  </div>
+
+                  <div className="bg-near-black rounded-xl p-4 text-xs leading-relaxed">
+                    <div className="text-stone-gray mb-1">DFT check (10 mol%, 44-atom cell)</div>
+                    {singlePrediction.dft ? (
+                      <p className="text-warm-silver">
+                        K<sub>DFT</sub> = <span className="text-coral font-medium">{singlePrediction.dft.K_DFT.toFixed(1)} GPa</span> at the {singlePrediction.dft.site} site
+                        vs {PURE_HAP_K_DFT.toFixed(1)} GPa for undoped HAp
+                        ({singlePrediction.dft.K_DFT - PURE_HAP_K_DFT > -0.45 ? 'host stiffness preserved' : `softens by ${(PURE_HAP_K_DFT - singlePrediction.dft.K_DFT).toFixed(1)} GPa`}).
+                        ML overpredicts by {(singlePrediction.dft.K_ML - singlePrediction.dft.K_DFT).toFixed(1)} GPa.
+                      </p>
+                    ) : (
+                      <p className="text-stone-gray">
+                        No DFT elastic tensor for this dopant. The ML bulk modulus above is not confirmed:
+                        DFT shows none of the ten dopants tested stiffens HAp, and ML overpredicts by 26.9 &plusmn; 3.1 GPa.
+                      </p>
+                    )}
                   </div>
 
                   <div className={`text-xs px-3 py-2 rounded-lg ${
@@ -208,7 +209,7 @@ export function PredictionTool({ selectedDopant, onSelectDopant }: Props) {
             <div className="bg-dark-surface rounded-2xl border border-dark-surface p-6">
               <h3 className="font-serif text-lg text-ivory mb-1">Ionic Radius vs. Bulk Modulus</h3>
               <p className="text-stone-gray text-xs mb-4">
-                Correlation r = -0.68. Selected element highlighted.
+                ML predictions; correlation r = &minus;0.46. Selected element highlighted.
               </p>
               <ResponsiveContainer width="100%" height={400}>
                 <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
@@ -267,7 +268,10 @@ export function PredictionTool({ selectedDopant, onSelectDopant }: Props) {
         {tab === 'compare' && (
           <div className="bg-dark-surface rounded-2xl border border-dark-surface p-6">
             <h3 className="font-serif text-lg text-ivory mb-1">Top 20 Dopants by Bulk Modulus</h3>
-            <p className="text-stone-gray text-xs mb-4">Percentage change relative to pure HAp (102.92 GPa)</p>
+            <p className="text-stone-gray text-xs mb-4">
+              ML-predicted change relative to pure HAp (102.92 GPa). DFT elastic tensors do not confirm this ordering:
+              none of the ten dopants tested (incl. Ti, Zr, Cr) stiffens HAp at 10 mol%.
+            </p>
             <ResponsiveContainer width="100%" height={450}>
               <BarChart data={groupChartData} margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#30302e" />
@@ -317,8 +321,8 @@ export function PredictionTool({ selectedDopant, onSelectDopant }: Props) {
                         <div className="text-ivory font-medium">{cd.K.toFixed(2)}</div>
                       </div>
                       <div>
-                        <div className="text-stone-gray text-xs">Est. E<sub>s</sub></div>
-                        <div className="text-ivory font-medium">{cd.EsEst.toFixed(2)}</div>
+                        <div className="text-stone-gray text-xs">|&Delta;E<sub>form</sub>|</div>
+                        <div className="text-ivory font-medium">{cd.dEForm.toFixed(2)}</div>
                       </div>
                       <div>
                         <div className="text-stone-gray text-xs">BFoM</div>
@@ -330,9 +334,10 @@ export function PredictionTool({ selectedDopant, onSelectDopant }: Props) {
               </div>
 
               <div className="mt-6 bg-near-black rounded-xl p-4 text-stone-gray text-xs leading-relaxed">
-                <strong className="text-warm-silver">Design guidance:</strong> Sr-Mg co-doping (BFoM = 0.813) is recommended
-                for combined stability and strength. Sr-Zn (BFoM = 0.824) adds antibacterial functionality.
-                Explicit DFT calculations are recommended before synthesis.
+                <strong className="text-warm-silver">Design guidance:</strong> Sr-Mg co-doping (BFoM = 1.001) is recommended
+                for combined thermodynamic compatibility and preserved stiffness. Sr-Zn (BFoM = 0.882) adds antibacterial functionality.
+                For Sr-Mg and Sr-Zn, DFT elastic tensors agree with linear mixing of the single-dopant DFT shifts to within 2 GPa.
+                Explicit DFT calculations are recommended before synthesis of other pairs.
               </div>
             </div>
           </div>

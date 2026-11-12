@@ -9,23 +9,28 @@ export function Footer() {
             <img src={logoUrl} alt="AIMS — Artificial Intelligence & Modeling for Materials Science" className="h-10 mb-3 brightness-0 invert opacity-80" />
             <h3 className="font-serif text-lg font-medium text-ivory mb-2">HAp Dopant Database</h3>
             <p className="text-stone-gray text-sm leading-relaxed">
-              Machine-learning screening of cationic dopants in hydroxyapatite via transfer learning,
-              validated by density functional theory.
+              Machine-learning screening of cationic dopants in hydroxyapatite from large-scale databases,
+              tested against density functional theory.
             </p>
           </div>
           <div>
             <h4 className="text-warm-silver text-sm font-medium mb-3">Citation</h4>
             <p className="text-stone-gray text-xs leading-relaxed font-mono">
-              "Machine-learning screening of cationic dopants in hydroxyapatite: Transfer learning predictions
-              validated by density functional theory."
-              <br />Physical Review Materials (2025).
+              "Machine-learning screening of cationic dopants in hydroxyapatite: Cross-domain predictions from
+              large-scale databases validated by density functional theory."
+              <br />Mater. Today Commun. (2026) 116613.
+              <br />
+              <a href="https://doi.org/10.1016/j.mtcomm.2026.116613" className="text-coral hover:underline" target="_blank" rel="noopener noreferrer">
+                doi:10.1016/j.mtcomm.2026.116613
+              </a>
             </p>
           </div>
           <div>
             <h4 className="text-warm-silver text-sm font-medium mb-3">Resources</h4>
             <ul className="space-y-2 text-sm text-stone-gray">
               <li><a href="#screening" className="hover:text-coral transition-colors">Periodic Table Screening</a></li>
-              <li><a href="#database" className="hover:text-coral transition-colors">Full Database (59 elements)</a></li>
+              <li><a href="#database" className="hover:text-coral transition-colors">Full Database (58 dopants + host)</a></li>
+              <li><a href="https://github.com/aofphy/modulus_project" className="hover:text-coral transition-colors" target="_blank" rel="noopener noreferrer">Models, structures and code (GitHub)</a></li>
               <li><a href="#predict" className="hover:text-coral transition-colors">Prediction Tool</a></li>
               <li><a href="#methodology" className="hover:text-coral transition-colors">Methodology</a></li>
             </ul>

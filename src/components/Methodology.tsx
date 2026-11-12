@@ -1,3 +1,5 @@
+import { dftElastic, PURE_HAP_K, PURE_HAP_K_DFT, PURE_HAP_EFORM, PURE_HAP_EG } from '../data/dopants'
+
 export function Methodology() {
   return (
     <section id="methodology" className="bg-parchment py-20 px-4">
@@ -53,9 +55,9 @@ export function Methodology() {
               </thead>
               <tbody>
                 {[
-                  { prop: 'Bulk Modulus (K)', db: 'AFLOW (1,181)', r2: '0.954 \u00B1 0.027', ci: '[0.881, 0.977]', mae: '8.2 \u00B1 0.9 GPa', rmse: '15.2 \u00B1 3.9 GPa' },
-                  { prop: 'Band Gap (Eg)', db: 'MatBench (10,000)', r2: '0.833 \u00B1 0.015', ci: '[0.804, 0.860]', mae: '0.37 \u00B1 0.01 eV', rmse: '0.65 \u00B1 0.03 eV' },
-                  { prop: 'Formation Energy', db: 'MatBench (10,000)', r2: '0.951 \u00B1 0.006', ci: '[0.937, 0.962]', mae: '0.14 \u00B1 0.01 eV/at', rmse: '0.26 \u00B1 0.02 eV/at' },
+                  { prop: 'Bulk Modulus (K)', db: 'AFLOW (1,181)', r2: '0.935 \u00B1 0.032', ci: '[0.860, 0.971]', mae: '9.3 \u00B1 1.1 GPa', rmse: '18.1 \u00B1 4.2 GPa' },
+                  { prop: 'Band Gap (Eg)', db: 'MatBench (10,000)', r2: '0.812 \u00B1 0.021', ci: '[0.767, 0.850]', mae: '0.39 \u00B1 0.02 eV', rmse: '0.69 \u00B1 0.04 eV' },
+                  { prop: 'Formation Energy', db: 'MatBench (10,000)', r2: '0.945 \u00B1 0.008', ci: '[0.927, 0.959]', mae: '0.15 \u00B1 0.01 eV/at', rmse: '0.27 \u00B1 0.02 eV/at' },
                 ].map(r => (
                   <tr key={r.prop} className="border-b border-border-cream">
                     <td className="px-4 py-3 font-medium text-near-black">{r.prop}</td>
@@ -70,7 +72,8 @@ export function Methodology() {
             </table>
           </div>
           <p className="text-stone-gray text-xs mt-4">
-            Bootstrap uncertainty quantification with n=100 iterations.
+            Bootstrap uncertainty quantification with n=1,000 iterations on the training databases
+            (five-fold cross-validation R<sup>2</sup> = 0.926 for bulk modulus).
             Random Forest selected for interpretability via SHAP analysis.
           </p>
         </div>
@@ -82,23 +85,23 @@ export function Methodology() {
             <ul className="space-y-3 text-sm text-olive-gray">
               <li className="flex gap-2">
                 <span className="text-terracotta font-bold mt-0.5">&#8226;</span>
-                <span>Lu<sup>3+</sup>, Ti<sup>4+</sup>, Zr<sup>4+</sup> are top mechanical enhancers (+4.2%, +3.9%, +3.6%)</span>
+                <span>ML ranks Lu<sup>3+</sup>, Ti<sup>4+</sup>, Zr<sup>4+</sup> highest in bulk modulus (+4.2%, +3.9%, +3.6%), but DFT does not confirm it: none of the ten dopants tested stiffens HAp at 10 mol%</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-terracotta font-bold mt-0.5">&#8226;</span>
-                <span>Sr<sup>2+</sup>, Y<sup>3+</sup>, Sc<sup>3+</sup> ranked globally optimal by biomedical figure of merit</span>
+                <span>DFT bulk moduli lie between 70.6 and 80.1 GPa (host 80.0 GPa); Zr, Mg, Sr and Sc preserve the host stiffness within 0.4 GPa, Al softens it most</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-terracotta font-bold mt-0.5">&#8226;</span>
-                <span>Electronegativity identified as universal descriptor across all three properties</span>
+                <span>Sr<sup>2+</sup> ranks first by biomedical figure of merit in all weighting scenarios, followed by Mg<sup>2+</sup> and Ba<sup>2+</sup>; Y<sup>3+</sup> and Sc<sup>3+</sup> are promising but weight-dependent</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-terracotta font-bold mt-0.5">&#8226;</span>
-                <span>Alkali metals (Na, K, Rb, Cs, Li) uniformly weaken the lattice (&minus;5 to &minus;8%)</span>
+                <span>DFT stiffness tracks the distortion of the dopant's oxygen polyhedron (r = &minus;0.86), not its formal charge: a local effect composition-only features cannot represent</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-terracotta font-bold mt-0.5">&#8226;</span>
-                <span>Optimal ionic radius range: 0.70&ndash;0.90 Å for mechanical enhancement</span>
+                <span>Electronegativity identified as universal descriptor across all three properties; alkali metals (Na, K, Rb, Cs, Li) uniformly weaken the lattice (&minus;5 to &minus;8%)</span>
               </li>
             </ul>
           </div>
@@ -143,15 +146,16 @@ export function Methodology() {
         <div className="bg-ivory rounded-2xl border border-border-cream p-6 shadow-[rgba(0,0,0,0.05)_0px_4px_24px]">
           <h3 className="font-serif text-xl font-medium text-near-black mb-2">DFT Validation</h3>
           <p className="text-olive-gray text-sm mb-4">
-            Independent DFT calculations (VASP, PBE functional) on 20 representative dopants at both Ca1 (4f) and Ca2 (6h) sites
-            confirm ML predictions with lattice-parameter agreement within 0.01 Å.
+            Independent DFT calculations (VASP, PBE functional): 29 dopants relaxed at both Ca1 (4f) and Ca2 (6h) sites
+            in 44-atom cells at 10 mol% (58 structures) supply site preference, substitution energy and band gap.
+            Elastic tensors for ten doped cells, each dopant at its preferred site and lowest-energy spin state, test the ML bulk moduli directly.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[
               { label: 'Structures Relaxed', value: '58' },
-              { label: 'Lattice MAE', value: '0.009 \u00C5' },
-              { label: 'Relative Error', value: '<0.05%' },
-              { label: 'Lattice Variation', value: '<0.3%' },
+              { label: 'Elastic Tensors', value: '10 + host' },
+              { label: 'ML \u2212 DFT Offset', value: '26.9 \u00B1 3.1 GPa' },
+              { label: 'Rank Correlation', value: '\u03C1 = 0.33' },
             ].map(s => (
               <div key={s.label} className="bg-parchment rounded-xl p-4">
                 <div className="font-serif text-xl font-medium text-terracotta">{s.value}</div>
@@ -159,18 +163,48 @@ export function Methodology() {
               </div>
             ))}
           </div>
+          <div className="overflow-x-auto mt-6">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-border-warm text-left">
+                  <th className="px-3 py-2 font-medium text-olive-gray">Dopant</th>
+                  <th className="px-3 py-2 font-medium text-olive-gray">Site</th>
+                  <th className="px-3 py-2 font-medium text-olive-gray">K<sub>ML</sub> (GPa)</th>
+                  <th className="px-3 py-2 font-medium text-olive-gray">K<sub>DFT</sub> (GPa)</th>
+                  <th className="px-3 py-2 font-medium text-olive-gray">vs host (80.0)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dftElastic.map(d => (
+                  <tr key={d.element} className="border-b border-border-cream">
+                    <td className="px-3 py-2 font-medium text-near-black">{d.element}</td>
+                    <td className="px-3 py-2 text-olive-gray">{d.site}</td>
+                    <td className="px-3 py-2 font-mono text-olive-gray">{d.K_ML.toFixed(1)}</td>
+                    <td className="px-3 py-2 font-mono text-terracotta font-medium">{d.K_DFT.toFixed(1)}</td>
+                    <td className="px-3 py-2 font-mono text-olive-gray">{d.K_DFT - PURE_HAP_K_DFT > 0 ? '+' : ''}{(d.K_DFT - PURE_HAP_K_DFT).toFixed(1)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-stone-gray text-xs mt-4">
+            The pure-HAp value of 80.0 GPa agrees with prior first-principles results (77 to 79 GPa) and experiment (82 to 89 GPa).
+            Charge-compensated supercells soften Ti and Zr further (53.4 and 73.7 GPa). The bulk-modulus ranking therefore requires DFT confirmation;
+            the prediction that Mg and Sr leave the host stiffness intact is confirmed.
+          </p>
         </div>
 
         {/* BFoM equation */}
         <div className="mt-12 bg-near-black rounded-2xl p-8 text-center">
           <h3 className="font-serif text-xl font-medium text-ivory mb-4">Biomedical Figure of Merit</h3>
           <div className="font-mono text-coral text-lg md:text-xl mb-4 overflow-x-auto">
-            BFoM = (K/K<sub>0</sub>) / (1 + E<sub>s</sub><sup>est</sup>) &times; (1 &minus; |E<sub>g</sub> &minus; E<sub>g</sub><sup>0</sup>| / 2E<sub>g</sub><sup>0</sup>) &times; T<sub>f</sub>
+            BFoM = (K/K<sub>0</sub>) / (1 + |E<sub>form</sub> &minus; E<sub>form</sub><sup>0</sup>| / E<sub>norm</sub>) &times; max(0, 1 &minus; |E<sub>g</sub> &minus; E<sub>g</sub><sup>0</sup>| / 2E<sub>g</sub><sup>0</sup>) &times; T<sub>f</sub>
           </div>
           <p className="text-warm-silver text-sm max-w-2xl mx-auto">
-            where K<sub>0</sub> = 102.92 GPa and E<sub>g</sub><sup>0</sup> = 5.25 eV are pure-HAp values,
-            T<sub>f</sub> is a toxicity factor (1.0 for low, 0.5 for moderate, 0.1 for high),
-            and the estimated substitution energy captures ionic radius mismatch and charge difference.
+            where K, E<sub>form</sub> and E<sub>g</sub> are the ML-predicted properties of the doped composition,
+            K<sub>0</sub> = {PURE_HAP_K.toFixed(2)} GPa, E<sub>form</sub><sup>0</sup> = {PURE_HAP_EFORM.toFixed(2)} eV/atom and E<sub>g</sub><sup>0</sup> = {PURE_HAP_EG.toFixed(2)} eV
+            are the ML values for undoped HAp, E<sub>norm</sub> = 1 eV/atom, and T<sub>f</sub> is a toxicity factor (1.0 low, 0.5 moderate, 0.1 high).
+            The host scores 1.000 by construction and is the reference, not a candidate. Sr stays rank 1 in all 39 weighting scenarios tested.
           </p>
         </div>
       </div>

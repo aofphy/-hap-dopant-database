@@ -1,73 +1,38 @@
-# React + TypeScript + Vite
+# HAp Dopant Database
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive web application for the periodic-table screening of cationic dopants in
+hydroxyapatite (HAp, Ca10(PO4)6(OH)2). Live site: https://aofphy.github.io/-hap-dopant-database/
 
-Currently, two official plugins are available:
+The data are those of the published article:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> Fongkaew, I. et al. Machine-learning screening of cationic dopants in hydroxyapatite:
+> Cross-domain predictions from large-scale databases validated by density functional theory.
+> *Materials Today Communications* (2026) 116613. https://doi.org/10.1016/j.mtcomm.2026.116613
 
-## React Compiler
+## What the site shows
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- ML (Random Forest, AFLOW/MatBench) bulk modulus, band gap and formation energy for 58 non-radioactive
+  dopants at the Ca site of Ca9M(PO4)6(OH)2 (10 mol%), with undoped HAp as the reference composition.
+- Biomedical figure of merit (paper Eq. 5) computed from the ML properties, toxicity class and the host values.
+- DFT (VASP, PBE) check: 58 relaxed 44-atom cells (29 dopants at both Ca sites) and elastic tensors for ten
+  doped cells. None of the ten dopants tested stiffens HAp; the ML model overpredicts by 26.9 +/- 3.1 GPa and
+  does not reproduce the DFT ordering. Mg and Sr are confirmed to leave the host stiffness intact.
 
-## Expanding the ESLint configuration
+Trained models, DFT structures and analysis code: https://github.com/aofphy/modulus_project
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Data file
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+`src/data/dopants.ts` is generated from the manuscript data files
+(`periodic_table_screening_results.csv` and `bfom_table_recomputed.csv`); do not edit it by hand.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Development
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm ci
+npm run dev      # local preview
+npm run build    # tsc + vite build -> dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Pushes to `main` deploy to GitHub Pages through `.github/workflows/deploy.yml`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+A Thai user manual with screenshots is in `docs/`.

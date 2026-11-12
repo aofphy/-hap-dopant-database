@@ -12,9 +12,15 @@ export function Hero() {
           Comprehensive Periodic Table Screening of Dopants in Hydroxyapatite
         </h1>
         <p className="text-olive-gray text-lg md:text-xl leading-relaxed max-w-3xl mx-auto mb-8">
-          Transfer learning predictions of bulk modulus, band gap, and formation energy
-          for 59 non-radioactive elements substituted at the Ca<sup>2+</sup> site &mdash;
-          validated by density functional theory.
+          Cross-domain machine-learning predictions of bulk modulus, band gap, and formation energy
+          for 58 non-radioactive dopants substituted at the Ca<sup>2+</sup> site, with undoped HAp as the reference,
+          tested against density functional theory.
+        </p>
+        <p className="text-stone-gray text-sm max-w-3xl mx-auto mb-8">
+          Published in <em>Materials Today Communications</em> (2026),{' '}
+          <a href="https://doi.org/10.1016/j.mtcomm.2026.116613" className="text-terracotta hover:underline" target="_blank" rel="noopener noreferrer">
+            doi:10.1016/j.mtcomm.2026.116613
+          </a>
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
@@ -34,9 +40,9 @@ export function Hero() {
         {/* Key stats */}
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { value: '59', label: 'Elements Screened' },
-            { value: 'R\u00B2 = 0.954', label: 'Bulk Modulus Accuracy' },
-            { value: '20', label: 'DFT Validations' },
+            { value: '58 + 1', label: 'Dopants Screened + Host' },
+            { value: 'R\u00B2 = 0.935', label: 'Bulk Modulus (training data)' },
+            { value: '58 / 10', label: 'DFT Cells / Elastic Tensors' },
             { value: '3', label: 'Properties Predicted' },
           ].map(s => (
             <div key={s.label} className="bg-ivory rounded-2xl p-5 border border-border-cream shadow-[rgba(0,0,0,0.05)_0px_4px_24px]">
